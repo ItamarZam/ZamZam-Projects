@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
+body {
+    background: linear-gradient(to right, #85FFBD, #FFFB7D);
+    font-family: 'Open Sans', sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+h1 {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 2.5rem;
+    color: #ffffff;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+i:hover {
+    color: #ff6347;
+}
+
+h1:hover {
+    color: #ff6347;
+    transition: color 0.3s ease;
+}
+
+.Button_Container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+button {
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-size: 18px;
+    background-color: #333333;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.1);
+    color: #333333;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+ol {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    list-style: none;
+    margin-top: 40px;
+    opacity: 0;
+    transform: translateY(50px);
+    animation: slideIn 1s forwards ease-in-out;
+    animation-delay: 0.5s;
+}
+
+li {
+    margin: 15px;
+}
+
+.card {
+    border: 1px solid #333333;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: #ffffff;
+    width: 200px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    transform: translateX(100px);
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card:nth-child(1) {
+    animation: slideIn 1s forwards ease-out;
+    animation-delay: 0.6s;
+}
+
+.card:nth-child(2) {
+    animation: slideIn 1s forwards ease-out;
+    animation-delay: 0.8s;
+}
+
+.card:nth-child(3) {
+    animation: slideIn 1s forwards ease-out;
+    animation-delay: 1s;
+}
+
+.card:nth-child(4) {
+    animation: slideIn 1s forwards ease-out;
+    animation-delay: 1.2s;
+}
+
+.forecast img {
+    display: block;
+    margin: 0 auto;
+    width: 64px;
+    height: 64px;
+}
+
+.forecast {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Slide-in Animation for Cards */
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
