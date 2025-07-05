@@ -26,7 +26,9 @@ def mail_merge_send(subject: str, html_body_templates: str, recipients: str) -> 
     """
     recipients: JSON string of a list of dicts, each with 'email' and 'name'
     """
-    print(f"[DEBUG] HTML body to send:\n{html_body_templates}")  # Debug print
+    print(f"[DEBUG] Subject: {subject}")
+    print(f"[DEBUG] HTML body to send:\n{html_body_templates}")
+    print(f"[DEBUG] Recipients: {recipients}")
     recipients_list = json.loads(recipients)
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))
     from_email = Email("itamarzam1@gmail.com")
@@ -48,6 +50,7 @@ def scrape_company_website(website_url: str) -> str:
     """
     Scrape the main text content from a company's website homepage and return it as a string.
     """
+    print(f"[DEBUG] Scraping website: {website_url}")
     try:
         response = requests.get(website_url, timeout=10)
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -57,9 +60,13 @@ def scrape_company_website(website_url: str) -> str:
         # Get visible text
         text = ' '.join(soup.stripped_strings)
         # Limit to first 2000 characters for brevity
-        return text[:2000]
+        result = text[:2000]
+        print(f"[DEBUG] Scraped content length: {len(result)} characters")
+        return result
     except Exception as e:
-        return f"ERROR: Failed to scrape website - {str(e)}"
+        error_msg = f"ERROR: Failed to scrape website - {str(e)}"
+        print(f"[DEBUG] Scraping error: {error_msg}")
+        return error_msg
 
 # דמו של נתוני לינקדאין (מומצא)
 demo_json = {
@@ -130,7 +137,8 @@ strategy_instructions = (
     "Output format:\n"
     "Pain Points (bulleted list)\n"
     "Sales Strategy (a short, personalized outreach message of ~100–150 words)\n\n"
-    "Focus on relevance, personalization, and intrigue. The goal is to get the company interested enough to book a call."
+    "Focus on relevance, personalization, and intrigue. The goal is to get the company interested enough to book a call.\n\n"
+    "IMPORTANT: Complete your analysis in ONE response. Do not ask for clarification or repeat steps."
 )
 
 instructions1 = (
@@ -145,7 +153,8 @@ instructions1 = (
     "- Ends with a soft CTA to schedule a call or learn more\n\n"
     "Use [Your Name] as a placeholder for the sender's name - this will be replaced with the actual sender name later.\n\n"
     "❗️Your output should only include the email body – no headers, no lists, no metadata.\n\n"
-    "🎯 Focus on personalization, professionalism, and sparking curiosity — not on hard selling."
+    "🎯 Focus on personalization, professionalism, and sparking curiosity — not on hard selling.\n\n"
+    "IMPORTANT: Write the email in ONE response. Do not ask for clarification or repeat steps."
 )
 
 instructions2 = (
@@ -160,7 +169,8 @@ instructions2 = (
     "- Ends with a soft CTA to schedule a call or learn more\n\n"
     "Use [Your Name] as a placeholder for the sender's name - this will be replaced with the actual sender name later.\n\n"
     "❗️Your output should only include the email body – no headers, no lists, no metadata.\n\n"
-    "🎯 Focus on personalization, professionalism, and sparking curiosity — not on hard selling."
+    "🎯 Focus on personalization, professionalism, and sparking curiosity — not on hard selling.\n\n"
+    "IMPORTANT: Write the email in ONE response. Do not ask for clarification or repeat steps."
 )
 
 instructions3 = (
@@ -175,7 +185,8 @@ instructions3 = (
     "- Ends with a soft CTA to schedule a call or learn more\n\n"
     "Use [Your Name] as a placeholder for the sender's name - this will be replaced with the actual sender name later.\n\n"
     "❗️Your output should only include the email body – no headers, no lists, no metadata.\n\n"
-    "🎯 Focus on personalization, professionalism, and sparking curiosity — not on hard selling."
+    "🎯 Focus on personalization, professionalism, and sparking curiosity — not on hard selling.\n\n"
+    "IMPORTANT: Write the email in ONE response. Do not ask for clarification or repeat steps."
 )
 
 strategy_agent = Agent(
@@ -211,37 +222,68 @@ tool1 = sales_agent1.as_tool(tool_name="sales_agent1", tool_description=descript
 tool2 = sales_agent2.as_tool(tool_name="sales_agent2", tool_description=description)
 tool3 = sales_agent3.as_tool(tool_name="sales_agent3", tool_description=description)
 
+print("[DEBUG] Created sales agent tools:")
+print(f"[DEBUG] - tool1: {tool1.name}")
+print(f"[DEBUG] - tool2: {tool2.name}")
+print(f"[DEBUG] - tool3: {tool3.name}")
+
 tools = [tool1, tool2, tool3]
 
-subject_instructions = "You can write a subject for a cold sales email. \nYou are given a message and you need to write a subject for an email that is likely to get a response. \nYou only write one subject for only one email."
+subject_instructions = "You can write a subject for a cold sales email. \nYou are given a message and you need to write a subject for an email that is likely to get a response. \nYou only write one subject for only one email.\n\nIMPORTANT: Write the subject in ONE response. Do not ask for clarification or repeat steps."
 
 html_instructions = (
-    "You are a professional web designer specializing in email marketing.\n"
-    "You receive a plain text sales email body and must convert it into a clean, professional HTML email.\n"
-    "Use simple, clean HTML with basic styling suitable for most email clients.\n"
+    "You are a professional email designer specializing in B2B sales emails.\n"
+    "You receive a plain text sales email body and must convert it into a beautiful, professional HTML email.\n"
+    "Your HTML should include:\n"
+    "- Clean, modern styling with proper fonts and colors\n"
+    "- Professional layout with good spacing\n"
+    "- Subtle background colors and borders\n"
+    "- Professional signature styling\n"
+    "- Mobile-responsive design\n"
     "Replace [Your Name] with the actual sender name provided in the message.\n"
-    "Always return a valid HTML email body, even if it is very simple.\n"
-    "Never return an error message—always return a valid HTML email body.\n"
-    "If you are unsure, wrap the text in <html><body>...</body></html> tags and return it.\n"
-    "Example:\n"
-    "<html><body><p>Hello NAME,</p><p>This is a sample email.</p><p>Best regards,<br>Itamar Zam</p></body></html>"
+    "Use a professional color scheme (blues, grays, whites).\n"
+    "Always return complete, valid HTML that looks professional.\n"
+    "Example structure:\n"
+    "<html><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>"
+    "<div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;'>"
+    "<div style='background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>"
+    "<p>Hello NAME,</p>"
+    "<p>This is a professional email.</p>"
+    "<p style='margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;'>"
+    "Best regards,<br><strong>Itamar Zam</strong><br>Sales Manager, ComplAI</p>"
+    "</div></div></body></html>\n\n"
+    "IMPORTANT: Convert the email in ONE response. Do not ask for clarification or repeat steps."
 )
 subject_writer= Agent(name="Email subject writer", instructions=subject_instructions,model="gpt-4o-mini")
 subject_tool=subject_writer.as_tool(tool_name="subject_writer", tool_description="write a subject for a cold sales email")
 
 html_converter=Agent(name="HTML email body converter", instructions= html_instructions,model="gpt-4o-mini")
-html_tool=html_converter.as_tool(tool_name="subject_writer", tool_description="convert a text email body to an HTML email body")
+html_tool=html_converter.as_tool(tool_name="html_converter", tool_description="convert a text email body to an HTML email body")
+
+print("[DEBUG] Created email tools:")
+print(f"[DEBUG] - subject_tool: {subject_tool.name}")
+print(f"[DEBUG] - html_tool: {html_tool.name}")
+print(f"[DEBUG] - mail_merge_send: function")
 
 emailer_tools = [subject_tool, html_tool, mail_merge_send]
 
 emailer_instructions = (
-    "You receive the plain text body of a sales email.\n"
-    "First, use the html_tool to transform this email body to a HTML formatted email.\n"
-    "Then, use the subject tool to generate the title for the email.\n"
-    "Finally, use the mail_merge_send tool to send the email to all recipients.\n"
-    "Do not repeat any step more than once. Once the email is sent, stop.\n"
-    "If the html_tool returns something that is not valid HTML, use it as-is and send anyway.\n"
-    "Never ask for clarification. Never repeat steps."
+    "You are an email manager responsible for formatting and sending professional B2B sales emails.\n"
+    "You receive a plain text body of a sales email.\n"
+    "Your process:\n"
+    "1. Use the subject_writer tool to generate an engaging subject line\n"
+    "2. Use the html_converter tool to transform the plain text email into a beautiful, professional HTML email\n"
+    "3. Use the mail_merge_send tool to send the HTML email to all recipients\n"
+    "Important:\n"
+    "- Always use the html_converter tool first to create beautiful HTML\n"
+    "- Make sure the HTML is complete and professional\n"
+    "- The HTML should include proper styling, colors, and layout\n"
+    "- Replace [Your Name] with the actual sender name in the HTML\n"
+    "- Send the email only after you have both the HTML body and subject\n"
+    "- The html_converter tool is named 'html_converter'\n"
+    "- Complete each step exactly once, then move to the next step\n"
+    "- Do not repeat any step or ask for clarification\n"
+    "IMPORTANT: Complete all steps in ONE response. Do not ask for clarification or repeat steps."
 )
 emailer_agent = Agent(
     name="Email Manager",
@@ -260,7 +302,8 @@ sales_manager_instructions = (
     "Carefully compare the results and select the single best email content, based on which is most likely to get a positive response. "
     "Do not write or edit the email yourself—always use the tools. "
     "Once you have chosen the best email body, hand off the content and the full recipient list to the Email Manager agent, "
-    "who will handle subject generation, HTML formatting, and sending."
+    "who will handle subject generation, HTML formatting, and sending.\n\n"
+    "IMPORTANT: Complete your task in ONE response. Do not ask for clarification or repeat steps."
 )
 sales_manager = Agent(
     name="Sales Manager",
@@ -274,6 +317,10 @@ message = "Send a cold sales email to all prospects"
 
 async def send_b2b_sales_emails(message: str, recipients: list, sender_name: str):
     print("=== Starting automated email sending process ===")
+    print(f"[DEBUG] Message: {message}")
+    print(f"[DEBUG] Recipients count: {len(recipients)}")
+    print(f"[DEBUG] Sender name: {sender_name}")
+    
     with trace("Automated SDR"):
         full_message = (
             f"{message}\n"
@@ -284,7 +331,8 @@ async def send_b2b_sales_emails(message: str, recipients: list, sender_name: str
         )
         print("\n[DEBUG] Message sent to sales_manager:")
         print(full_message)
-        result = await Runner.run(sales_manager, full_message)
+        print("\n[DEBUG] Starting Runner.run with max_turns=20...")
+        result = await Runner.run(sales_manager, full_message, max_turns=20)
         print("\n[DEBUG] Final result from the system:")
         print(result)
     print("=== Process finished ===")
