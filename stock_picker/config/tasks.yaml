@@ -1,0 +1,45 @@
+find_trending_companies:
+  description: >
+    Find 2-3 companies in {sector} that meet the {field} criteria AND are experiencing significant events 
+    that could impact their stock price. For each company, provide: company name, ticker symbol, and 
+    the specific significant event they're experiencing. Focus on publicly traded companies.
+  expected_output: >
+    A structured list with company name, ticker, and the specific event for each company
+  agent: trending_company_finder
+  output_file: output/trending_companies.json
+
+research_trending_companies:
+  description: >
+    Given a list of companies that meet {field} criteria, provide detailed analysis of each company 
+    by searching online. Research their current situation, the significant events they're experiencing, 
+    and how these events might impact their future performance and stock price.
+  expected_output: >
+    A comprehensive report analyzing each company's current events and potential stock price impact
+  agent: financial_researcher
+  context:
+    - find_trending_companies
+  output_file: output/research_report.json
+
+pick_best_company:
+  description: >
+    Analyze the research findings and pick the best company for investment from the companies 
+    that meet {field} criteria. Consider the significance of their current events, potential 
+    stock price impact, and overall investment potential. Don't pick the same company twice.
+  expected_output: >
+    The chosen company for investment and detailed reasoning for the selection
+  agent: stock_picker
+  context:
+    - research_trending_companies
+  output_file: output/decision.md
+
+create_final_report:
+  description: >
+    Create a comprehensive final investment report for the chosen company. Include company name, 
+    ticker, sector, market position, future outlook, investment potential, financials, recent news, 
+    and past assessment. Write in a clear and engaging way to help with investment strategy.
+  expected_output: >
+    A detailed final investment report covering all aspects of the chosen company
+  agent: final_reporter
+  context:
+    - pick_best_company
+  output_file: output/final_investment_report.md
